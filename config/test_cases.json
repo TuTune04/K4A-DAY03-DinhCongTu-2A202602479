@@ -1,0 +1,37 @@
+[
+  {
+    "id": "TC01",
+    "type": "direct_query",
+    "question": "Chào bạn, bạn có thể hỗ trợ tôi những việc gì trong thư viện?",
+    "expected_behavior": "Agent giới thiệu ngắn gọn khả năng tra cứu và gia hạn tài liệu, không cần gọi Tool.",
+    "complexity": "Low"
+  },
+  {
+    "id": "TC02",
+    "type": "single_tool_query",
+    "question": "Hãy tra cứu sách Deep Learning và cho tôi biết sách nằm ở đâu, hiện có thể mượn không.",
+    "expected_behavior": "Agent gọi Tool 'library_query' với query 'Deep Learning' và trả lời đúng vị trí, tình trạng khả dụng của BK002.",
+    "complexity": "Medium"
+  },
+  {
+    "id": "TC03",
+    "type": "loan_renewal",
+    "question": "Tôi là độc giả RD2026001, tôi xác nhận muốn gia hạn tài liệu BK001.",
+    "expected_behavior": "Agent gọi Tool 'renew_library_loan' với reader_id RD2026001, document_id BK001 và confirmation bằng true; sau đó thông báo hạn trả mới.",
+    "complexity": "Medium"
+  },
+  {
+    "id": "TC04",
+    "type": "multi_step_reasoning",
+    "question": "Tôi là độc giả RD2026001. Hãy kiểm tra tài liệu BK003 và gia hạn giúp tôi nếu đủ điều kiện; tôi xác nhận đồng ý gia hạn.",
+    "expected_behavior": "Agent thực hiện chuỗi ReAct: gọi 'library_query' để kiểm tra BK003, sau đó gọi 'renew_library_loan'; hệ thống từ chối chính xác vì tài liệu đã được độc giả khác đặt trước.",
+    "complexity": "High"
+  },
+  {
+    "id": "TC05",
+    "type": "edge_case_handling",
+    "question": "Hãy tra cứu tài liệu có mã BK999.",
+    "expected_behavior": "Agent gọi 'library_query', nhận kết quả NOT_FOUND và phản hồi lịch sự rằng không tìm thấy tài liệu, không bịa đặt dữ liệu.",
+    "complexity": "Medium"
+  }
+]

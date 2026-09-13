@@ -6,6 +6,7 @@ Hỗ trợ Native Tool Calling và chuyển đổi linh hoạt qua biến môi t
 import os
 import sys
 import json
+import re
 from typing import Dict, Any, List
 from dotenv import load_dotenv
 
@@ -36,28 +37,60 @@ class MockOfflineProvider(BaseLLMProvider):
 
     def generate_with_tools(self, prompt: str, tools_schema: List[Dict[str, Any]], system_prompt: str = "") -> Dict[str, Any]:
         prompt_lower = prompt.lower()
-        
+
         # Mô phỏng nhận diện intent gọi Tool
-        if "sv2026001" in prompt_lower and "đặt lịch" in prompt_lower:
+        if "observation từ library_query" in prompt_lower and "gia hạn" in prompt_lower:
             return {
                 "type": "tool_call",
-                "tool_name": "schedule_appointment",
-                "arguments": {"student_id": "SV2026001", "datetime_str": "14:00 15/09/2026", "advisor_name": "PGS.TS Nguyễn Văn A"},
-                "thought": "Người dùng yêu cầu đặt lịch hẹn tư vấn cho sinh viên SV2026001. Tôi sẽ gọi tool schedule_appointment."
+                "tool_name": "renew_library_loan",
+                "arguments": {
+                    "reader_id": "RD2026001",
+                    "document_id": "BK003" if "bk003" in prompt_lower else "BK001",
+                    "confirmation": True
+                },
+                "thought": "Đã có kết quả tra cứu; tôi tiếp tục gọi công cụ gia hạn."
             }
-        elif "sv2026001" in prompt_lower or "tra cứu" in prompt_lower:
+        if "gia hạn" in prompt_lower and not any(
+            phrase in prompt_lower for phrase in ["kiểm tra", "nếu có thể", "nếu đủ điều kiện"]
+        ):
             return {
                 "type": "tool_call",
-                "tool_name": "academic_query",
-                "arguments": {"student_id": "SV2026001"},
-                "thought": "Người dùng muốn tra cứu thông tin học vụ của sinh viên SV2026001. Tôi sẽ gọi tool academic_query."
+                "tool_name": "renew_library_loan",
+                "arguments": {
+                    "reader_id": "RD2026001",
+                    "document_id": "BK003" if "bk003" in prompt_lower else "BK001",
+                    "confirmation": "xác nhận" in prompt_lower
+                },
+                "thought": "Người dùng yêu cầu gia hạn và đã cung cấp thông tin cần thiết."
             }
-        else:
+        if "tra cứu" in prompt_lower or "nằm ở đâu" in prompt_lower or "bk" in prompt_lower:
+            if "bk999" in prompt_lower:
+                query = "BK999"
+            elif "bk003" in prompt_lower:
+                query = "BK003"
+            elif "bk001" in prompt_lower:
+                query = "BK001"
+            else:
+                match = re.search(
+                    r"(?:tra cứu\s+(?:sách|tài liệu)|tìm\s+(?:sách|tài liệu))\s+(.+?)(?:\s+và\s+cho|[?.!,]|$)",
+                    prompt,
+                    flags=re.IGNORECASE
+                )
+                query = match.group(1).strip() if match else prompt.strip()
+            arguments = {"query": query}
+            if "rd2026001" in prompt_lower:
+                arguments["reader_id"] = "RD2026001"
             return {
-                "type": "text",
-                "content": f"[Mock Agent Response]: Xin chào! Quy chế học vụ VinUni yêu cầu sinh viên tích lũy tối thiểu 120 tín chỉ và duy trì GPA trên 2.0 để tốt nghiệp.",
-                "thought": "Câu hỏi chung về quy chế học vụ, trả lời trực tiếp không cần gọi Tool."
+                "type": "tool_call",
+                "tool_name": "library_query",
+                "arguments": arguments,
+                "thought": "Người dùng cần dữ liệu thư viện thời gian thực; tôi gọi library_query."
             }
+        return {
+            "type": "text",
+            "content": "Tôi có thể giúp bạn tra cứu vị trí, tình trạng tài liệu và gia hạn lượt mượn hợp lệ.",
+            "thought": "Đây là câu hỏi chung nên không cần gọi Tool."
+        }
 
 
 class GeminiProvider(BaseLLMProvider):

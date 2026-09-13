@@ -41,6 +41,14 @@ cp config/test_cases.example.json config/test_cases.json
 python src/app.py --all
 ```
 
+Chạy giao diện web nhẹ, không cần cài thêm thư viện:
+
+```bash
+python src/ui.py
+```
+
+Sau đó mở `http://127.0.0.1:8000` trong trình duyệt.
+
 **Kỳ vọng Output màn hình:**
 ```text
 ✅ [MOCK OFFLINE MODE PASS]: Môi trường đã sẵn sàng! 
