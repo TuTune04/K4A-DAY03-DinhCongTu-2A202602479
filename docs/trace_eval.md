@@ -1,7 +1,7 @@
 # 📊 BÁO CÁO THU HOẠCH NGHIỆM THU BÀI LAB 3 (BƯỚC 3 — SUBMISSION ARTIFACT)
 
-> **Họ và Tên Học viên:** [Điền Họ và Tên]  
-> **Mã Sinh Viên / Mã Học viên:** [Điền MSSV]  
+> **Họ và Tên Học viên:** Đinh Công Tú 
+> **Mã Sinh Viên / Mã Học viên:** 2A202602479
 > **Chủ đề Lựa chọn:** Gợi ý 1.2 — Trợ lý Quản lý Thư viện & Tài liệu
 
 ---
